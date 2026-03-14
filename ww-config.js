@@ -69,6 +69,13 @@ export default {
       },
       defaultValue: "range",
       section: "settings",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip: 'A string: "single" or "range"',
+      },
+      /* wwEditor:end */
     },
     showOn: {
       label: { en: "Show on" },
@@ -112,6 +119,14 @@ export default {
       },
       defaultValue: "dd MMM yyyy",
       section: "settings",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip:
+          'Format string: "dd MMM yyyy" | "yyyy-MM-dd" | "dd/MM/yyyy" | "MM/dd/yyyy" | "dd-MM-yyyy" | "d MMMM yyyy"',
+      },
+      /* wwEditor:end */
     },
     rangeDelimiter: {
       hidden: (content) => content.pickerMode === "single",
@@ -176,6 +191,49 @@ export default {
       },
       defaultValue: 0,
       section: "settings",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "number",
+        tooltip: "0 for Sunday, 1 for Monday",
+      },
+      /* wwEditor:end */
+    },
+    minDate: {
+      label: { en: "Min date (earliest)" },
+      type: "Text",
+      bindable: true,
+      defaultValue: "",
+      section: "settings",
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip:
+          'ISO date string or timestamp to restrict earliest selectable date. E.g. "2026-03-14" or leave empty for no restriction.',
+      },
+      propertyHelp: {
+        tooltip:
+          "Set the earliest date users can select. Bind to today's date to prevent backdating. Leave empty for no restriction.",
+      },
+      /* wwEditor:end */
+    },
+    maxDate: {
+      label: { en: "Max date (latest)" },
+      type: "Text",
+      bindable: true,
+      defaultValue: "",
+      section: "settings",
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip:
+          'ISO date string or timestamp to restrict latest selectable date. E.g. "2026-12-31" or leave empty for no restriction.',
+      },
+      propertyHelp: {
+        tooltip:
+          "Set the latest date users can select. Leave empty for no restriction.",
+      },
+      /* wwEditor:end */
     },
 
     // ─── Styles Tab ───

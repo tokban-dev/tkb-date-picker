@@ -1,14 +1,14 @@
 <template>
   <!-- ═══ ALWAYS VISIBLE (inline calendar) ═══ -->
   <div
-    v-if="content.showOn === 'alwaysVisible'"
+    v-if="content?.showOn === 'alwaysVisible'"
     class="tkb-dp-root"
-    :class="{ 'tkb-dp-dark': content.isDarkMode }"
+    :class="{ 'tkb-dp-dark': content?.isDarkMode }"
     :style="cssVars"
   >
     <div class="tkb-dp-inline">
-      <div class="tkb-dp-popover tkb-dp-inline-popover" :class="{ 'tkb-dp-has-presets': content.showPresets }">
-        <div v-if="content.showPresets" class="tkb-dp-presets">
+      <div class="tkb-dp-popover tkb-dp-inline-popover" :class="{ 'tkb-dp-has-presets': content?.showPresets }">
+        <div v-if="content?.showPresets" class="tkb-dp-presets">
           <ul>
             <li
               v-for="preset in presets"
@@ -34,8 +34,10 @@
                 :is-range="true"
                 :today="today"
                 :locale="resolvedLocale"
-                :first-day-of-week="content.firstDayOfWeek"
+                :first-day-of-week="content?.firstDayOfWeek"
                 :show-nav="idx === 0 ? 'left' : 'right'"
+                :min-date="resolvedMinDate"
+                :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
                 @hover-day="handleDayHover"
                 @nav-prev-month="navMonth(idx, -1)"
@@ -60,8 +62,10 @@
                 :is-range="false"
                 :today="today"
                 :locale="resolvedLocale"
-                :first-day-of-week="content.firstDayOfWeek"
+                :first-day-of-week="content?.firstDayOfWeek"
                 show-nav="both"
+                :min-date="resolvedMinDate"
+                :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
                 @hover-day="handleDayHover"
                 @nav-prev-month="navMonth(0, -1)"
@@ -75,9 +79,9 @@
             </div>
           </template>
         </div>
-        <div v-if="content.showTodayButton || content.showClearButton" class="tkb-dp-footer">
-          <span v-if="content.showTodayButton" class="tkb-dp-footer-link" @click="goToToday">{{ t('today') }}</span>
-          <span v-if="content.showClearButton" class="tkb-dp-footer-link" @click="clearSelection">{{ t('clear') }}</span>
+        <div v-if="content?.showTodayButton || content?.showClearButton" class="tkb-dp-footer">
+          <span v-if="content?.showTodayButton" class="tkb-dp-footer-link" @click="goToToday">{{ t('today') }}</span>
+          <span v-if="content?.showClearButton" class="tkb-dp-footer-link" @click="clearSelection">{{ t('clear') }}</span>
         </div>
       </div>
     </div>
@@ -87,7 +91,7 @@
   <div
     v-else
     class="tkb-dp-root"
-    :class="{ 'tkb-dp-dark': content.isDarkMode }"
+    :class="{ 'tkb-dp-dark': content?.isDarkMode }"
     :style="[cssVars, layoutStyle]"
     ref="rootRef"
   >
@@ -98,14 +102,14 @@
         'tkb-dp-range-input': isRange,
         'tkb-dp-open': isOpen,
       }"
-      @click="content.showOn === 'click' && !isEditing ? toggleOpen() : null"
-      @mouseenter="content.showOn === 'hover' && !isEditing ? openPicker() : null"
-      @mouseleave="content.showOn === 'hover' && !isEditing ? closePicker() : null"
+      @click="content?.showOn === 'click' && !isEditing ? toggleOpen() : null"
+      @mouseenter="content?.showOn === 'hover' && !isEditing ? openPicker() : null"
+      @mouseleave="content?.showOn === 'hover' && !isEditing ? closePicker() : null"
     >
       <input
         type="text"
         class="tkb-dp-input"
-        :placeholder="content.placeholder || t('selectDate')"
+        :placeholder="content?.placeholder || t('selectDate')"
         :value="displayValue"
         readonly
       />
@@ -118,7 +122,7 @@
         </svg>
       </span>
       <span
-        v-if="hasValue && content.showClearButton"
+        v-if="hasValue && content?.showClearButton"
         class="tkb-dp-clear"
         @click.stop="clearSelection"
       >
@@ -130,11 +134,11 @@
 
     <!-- Second input for range (if startEndInputs) -->
     <div
-      v-if="isRange && content.startEndInputs && content.showOn !== 'alwaysVisible'"
+      v-if="isRange && content?.startEndInputs && content?.showOn !== 'alwaysVisible'"
       class="tkb-dp-input-wrap"
       :class="{ 'tkb-dp-open': isOpen }"
-      @click="content.showOn === 'click' && !isEditing ? toggleOpen() : null"
-      @mouseenter="content.showOn === 'hover' && !isEditing ? openPicker() : null"
+      @click="content?.showOn === 'click' && !isEditing ? toggleOpen() : null"
+      @mouseenter="content?.showOn === 'hover' && !isEditing ? openPicker() : null"
     >
       <input
         type="text"
@@ -158,12 +162,12 @@
       <div
         v-if="isOpen"
         class="tkb-dp-popover"
-        :class="{ 'tkb-dp-has-presets': content.showPresets }"
-        @mouseenter="content.showOn === 'hover' ? cancelClose() : null"
-        @mouseleave="content.showOn === 'hover' && !isEditing ? closePicker() : null"
+        :class="{ 'tkb-dp-has-presets': content?.showPresets }"
+        @mouseenter="content?.showOn === 'hover' ? cancelClose() : null"
+        @mouseleave="content?.showOn === 'hover' && !isEditing ? closePicker() : null"
       >
         <!-- Preset sidebar -->
-        <div v-if="content.showPresets" class="tkb-dp-presets">
+        <div v-if="content?.showPresets" class="tkb-dp-presets">
           <ul>
             <li
               v-for="preset in presets"
@@ -191,8 +195,10 @@
                 :is-range="true"
                 :today="today"
                 :locale="resolvedLocale"
-                :first-day-of-week="content.firstDayOfWeek"
+                :first-day-of-week="content?.firstDayOfWeek"
                 :show-nav="idx === 0 ? 'left' : 'right'"
+                :min-date="resolvedMinDate"
+                :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
                 @hover-day="handleDayHover"
                 @nav-prev-month="navMonth(idx, -1)"
@@ -217,8 +223,10 @@
                 :is-range="false"
                 :today="today"
                 :locale="resolvedLocale"
-                :first-day-of-week="content.firstDayOfWeek"
+                :first-day-of-week="content?.firstDayOfWeek"
                 show-nav="both"
+                :min-date="resolvedMinDate"
+                :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
                 @hover-day="handleDayHover"
                 @nav-prev-month="navMonth(0, -1)"
@@ -234,15 +242,15 @@
         </div>
 
         <!-- Footer -->
-        <div v-if="content.showTodayButton || content.showClearButton" class="tkb-dp-footer">
-          <span v-if="content.showTodayButton" class="tkb-dp-footer-link" @click="goToToday">{{ t('today') }}</span>
-          <span v-if="content.showClearButton" class="tkb-dp-footer-link" @click="clearSelection">{{ t('clear') }}</span>
+        <div v-if="content?.showTodayButton || content?.showClearButton" class="tkb-dp-footer">
+          <span v-if="content?.showTodayButton" class="tkb-dp-footer-link" @click="goToToday">{{ t('today') }}</span>
+          <span v-if="content?.showClearButton" class="tkb-dp-footer-link" @click="clearSelection">{{ t('clear') }}</span>
         </div>
       </div>
     </transition>
 
     <!-- Click-outside overlay -->
-    <div v-if="isOpen && content.showOn === 'click'" class="tkb-dp-backdrop" @click="closePicker"></div>
+    <div v-if="isOpen && content?.showOn === 'click'" class="tkb-dp-backdrop" @click="closePicker"></div>
   </div>
 </template>
 
@@ -393,6 +401,8 @@ const CalendarPanel = defineComponent({
     locale: { type: String, default: "en" },
     firstDayOfWeek: { type: Number, default: 0 },
     showNav: { type: String, default: "both" }, // left | right | both
+    minDate: { type: Date, default: null },
+    maxDate: { type: Date, default: null },
   },
   emits: [
     "select-day",
@@ -477,10 +487,17 @@ const CalendarPanel = defineComponent({
       return arr;
     });
 
+    function isDayDisabled(d) {
+      if (props.minDate && startOfDay(d).getTime() < startOfDay(props.minDate).getTime()) return true;
+      if (props.maxDate && startOfDay(d).getTime() > startOfDay(props.maxDate).getTime()) return true;
+      return false;
+    }
+
     function getDayClasses(cell) {
       const d = cell.date;
       const cls = ["tkb-dp-day"];
       if (cell.isOtherMonth) cls.push("tkb-dp-day--other");
+      if (isDayDisabled(d)) cls.push("tkb-dp-day--disabled");
       if (isSameDay(d, props.today)) cls.push("tkb-dp-day--today");
 
       if (props.isRange && props.selectedStart && props.selectedEnd) {
@@ -676,17 +693,18 @@ const CalendarPanel = defineComponent({
         const daysCells = h(
           "div",
           { class: "tkb-dp-days" },
-          daysGrid.value.map((cell) =>
-            h(
+          daysGrid.value.map((cell) => {
+            const disabled = isDayDisabled(cell.date);
+            return h(
               "span",
               {
                 class: getDayClasses(cell),
-                onClick: () => emit("select-day", cell.date),
-                onMouseenter: () => emit("hover-day", cell.date),
+                onClick: disabled ? undefined : () => emit("select-day", cell.date),
+                onMouseenter: disabled ? undefined : () => emit("hover-day", cell.date),
               },
               String(cell.date.getDate())
-            )
-          )
+            );
+          })
         );
 
         return h("div", { class: "tkb-dp-panel-inner" }, [
@@ -779,7 +797,7 @@ export default {
         name: "start",
         type: "string",
         defaultValue: computed(() =>
-          props.content.initValueStart
+          props.content?.initValueStart
             ? startOfDay(new Date(props.content.initValueStart)).toString()
             : ""
         ),
@@ -791,7 +809,7 @@ export default {
         name: "end",
         type: "string",
         defaultValue: computed(() =>
-          props.content.initValueEnd
+          props.content?.initValueEnd
             ? endOfDay(new Date(props.content.initValueEnd)).toString()
             : ""
         ),
@@ -822,10 +840,10 @@ export default {
       return false;
     },
     isRange() {
-      return this.content.pickerMode === "range";
+      return this.content?.pickerMode === "range";
     },
     resolvedLocale() {
-      if (this.content.lang === "pageLang") {
+      if (this.content?.lang === "pageLang") {
         const pageLang =
           typeof wwLib !== "undefined" ? wwLib.wwLang.lang : "en";
         // Map page lang to our supported locales
@@ -836,11 +854,11 @@ export default {
         }
         return TRANSLATIONS[pageLang] ? pageLang : "en";
       }
-      return this.content.lang || "en";
+      return this.content?.lang || "en";
     },
     panelDates() {
       if (this.isRange) {
-        const cols = this.content.columns || 2;
+        const cols = this.content?.columns || 2;
         const dates = [];
         for (let i = 0; i < cols; i++) {
           dates.push(addMonths(this.panelBaseDate, i));
@@ -897,47 +915,57 @@ export default {
         },
       ];
     },
+    resolvedMinDate() {
+      if (!this.content?.minDate) return null;
+      const d = new Date(this.content.minDate);
+      return isNaN(d.getTime()) ? null : startOfDay(d);
+    },
+    resolvedMaxDate() {
+      if (!this.content?.maxDate) return null;
+      const d = new Date(this.content.maxDate);
+      return isNaN(d.getTime()) ? null : startOfDay(d);
+    },
     hasValue() {
       return !!this.selectedStart;
     },
     displayValue() {
-      const fmt = this.content.dateFormat || "dd MMM yyyy";
+      const fmt = this.content?.dateFormat || "dd MMM yyyy";
       const loc = this.resolvedLocale;
-      if (this.isRange && !this.content.startEndInputs) {
+      if (this.isRange && !this.content?.startEndInputs) {
         if (this.selectedStart && this.selectedEnd) {
           return (
             formatDate(this.selectedStart, fmt, loc) +
-            (this.content.rangeDelimiter || " \u2013 ") +
+            (this.content?.rangeDelimiter || " \u2013 ") +
             formatDate(this.selectedEnd, fmt, loc)
           );
         }
         if (this.selectedStart) {
-          return formatDate(this.selectedStart, fmt, loc) + (this.content.rangeDelimiter || " \u2013 ") + "...";
+          return formatDate(this.selectedStart, fmt, loc) + (this.content?.rangeDelimiter || " \u2013 ") + "...";
         }
         return "";
       }
       return this.selectedStart ? formatDate(this.selectedStart, fmt, loc) : "";
     },
     displayValueEnd() {
-      const fmt = this.content.dateFormat || "dd MMM yyyy";
+      const fmt = this.content?.dateFormat || "dd MMM yyyy";
       return this.selectedEnd
         ? formatDate(this.selectedEnd, fmt, this.resolvedLocale)
         : "";
     },
     cssVars() {
       return {
-        "--tkb-primary": this.content.primaryColor || "#F08227",
-        "--tkb-primary-light": this.content.primaryLightColor || "#FFF3E8",
-        "--tkb-primary-hover": this.content.primaryHoverColor || "#FFFAF5",
-        "--tkb-text": this.content.textColor || "#2C3131",
-        "--tkb-border": this.content.borderColor || "#E8E8E8",
-        "--tkb-radius": (this.content.borderRadius || 8) + "px",
+        "--tkb-primary": this.content?.primaryColor || "#F08227",
+        "--tkb-primary-light": this.content?.primaryLightColor || "#FFF3E8",
+        "--tkb-primary-hover": this.content?.primaryHoverColor || "#FFFAF5",
+        "--tkb-text": this.content?.textColor || "#2C3131",
+        "--tkb-border": this.content?.borderColor || "#E8E8E8",
+        "--tkb-radius": (this.content?.borderRadius ?? 8) + "px",
       };
     },
     layoutStyle() {
       return {
-        "--direction": this.content.direction || "row",
-        "--alignement": this.content.alignement || "center",
+        "--direction": this.content?.direction || "row",
+        "--alignement": this.content?.alignement || "center",
       };
     },
   },
@@ -973,11 +1001,11 @@ export default {
   },
   mounted() {
     // Initialize from init values
-    if (this.content.initValueStart) {
+    if (this.content?.initValueStart) {
       this.selectedStart = startOfDay(new Date(this.content.initValueStart));
       this.panelBaseDate = new Date(this.selectedStart);
     }
-    if (this.content.initValueEnd) {
+    if (this.content?.initValueEnd) {
       this.selectedEnd = endOfDay(new Date(this.content.initValueEnd));
     }
     if (!this.selectedStart) {
@@ -1021,6 +1049,11 @@ export default {
 
     // ─── Day selection ───
     handleDaySelect(date) {
+      // Guard: skip disabled dates
+      const d = startOfDay(date);
+      if (this.resolvedMinDate && d.getTime() < this.resolvedMinDate.getTime()) return;
+      if (this.resolvedMaxDate && d.getTime() > this.resolvedMaxDate.getTime()) return;
+
       if (!this.isRange) {
         // Single date mode
         this.selectedStart = startOfDay(date);
@@ -1037,7 +1070,7 @@ export default {
             },
           },
         });
-        if (this.content.showOn !== "alwaysVisible") {
+        if (this.content?.showOn !== "alwaysVisible") {
           setTimeout(() => (this.isOpen = false), 200);
         }
         return;
@@ -1074,7 +1107,7 @@ export default {
             },
           },
         });
-        if (this.content.showOn !== "alwaysVisible") {
+        if (this.content?.showOn !== "alwaysVisible") {
           setTimeout(() => (this.isOpen = false), 300);
         }
       }
@@ -1133,7 +1166,7 @@ export default {
           },
         },
       });
-      if (this.content.showOn !== "alwaysVisible") {
+      if (this.content?.showOn !== "alwaysVisible") {
         setTimeout(() => (this.isOpen = false), 300);
       }
     },
@@ -1163,34 +1196,41 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 /* ═══════════════════════════════════════════════
    TOKBAN DATE PICKER — Scoped Styles
    ═══════════════════════════════════════════════ */
 
 .tkb-dp-root {
   position: relative;
-  display: inline-flex;
+  display: flex;
   flex-direction: var(--direction, row);
   justify-content: var(--alignement, center);
-  align-items: var(--alignement, center);
+  align-items: center;
   gap: 8px;
+  width: 100%;
+  height: 100%;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  box-sizing: border-box;
 }
 
 /* ── Input ── */
 .tkb-dp-input-wrap {
   position: relative;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  min-width: 180px;
+  flex: 1;
+  height: 100%;
+  min-width: 0;
 }
 .tkb-dp-input-wrap.tkb-dp-range-input {
-  min-width: 260px;
+  /* range input can be slightly wider when space allows */
 }
 .tkb-dp-input {
   width: 100%;
-  padding: 10px 60px 10px 14px;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 8px 40px 8px 14px;
   border: 1.5px solid var(--tkb-border);
   border-radius: var(--tkb-radius);
   font-size: 14px;
@@ -1227,7 +1267,7 @@ export default {
 }
 .tkb-dp-clear {
   position: absolute;
-  right: 34px;
+  right: 32px;
   top: 50%;
   transform: translateY(-50%);
   color: #C9C9C9;
@@ -1472,6 +1512,17 @@ export default {
 .tkb-dp-day--other:hover {
   color: #A8A8A8;
   background: #FAFAFA;
+}
+
+/* Disabled (minDate / maxDate) */
+.tkb-dp-day--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.tkb-dp-day--disabled:hover {
+  background: transparent;
+  color: inherit;
 }
 
 /* ── Month Grid ── */
