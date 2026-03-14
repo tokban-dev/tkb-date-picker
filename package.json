@@ -1,0 +1,13 @@
+{
+  "name": "tokban-date-picker",
+  "version": "1.0.0",
+  "description": "Tokban Date Picker & Date Range Picker with preset sidebar, year/month picker, multilingual support",
+  "scripts": {
+    "build": "weweb build",
+    "serve": "weweb serve"
+  },
+  "devDependencies": {
+    "@weweb/cli": "latest"
+  },
+  "dependencies": {}
+}
