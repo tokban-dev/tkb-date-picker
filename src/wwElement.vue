@@ -1001,8 +1001,8 @@ export default {
         this.rangePicking = false;
         this.hoverDate = null;
 
-        // Navigate to end date's month so user sees the complete selection
-        this.panelBaseDate = new Date(end.getFullYear(), end.getMonth(), 1);
+        // Navigate to the last clicked date's month so user sees what they just picked
+        this.panelBaseDate = new Date(date.getFullYear(), date.getMonth(), 1);
 
         this.setValueStart(toTimestamptz(this.selectedStart));
         this.setValueEnd(toTimestamptz(this.selectedEnd));
