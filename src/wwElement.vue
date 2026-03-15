@@ -393,6 +393,18 @@ function formatDate(d, fmt, locale) {
     .replace("YYYY", String(d.getFullYear()));
 }
 
+// Format date as ISO 8601 with local timezone offset (PostgreSQL timestamptz compatible)
+// e.g. "2026-03-01T00:00:00.000+07:00"
+function toTimestamptz(d) {
+  if (!d) return "";
+  const offset = -d.getTimezoneOffset();
+  const sign = offset >= 0 ? "+" : "-";
+  const hh = String(Math.floor(Math.abs(offset) / 60)).padStart(2, "0");
+  const mm = String(Math.abs(offset) % 60).padStart(2, "0");
+  const p = (n, len = 2) => String(n).padStart(len, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}.${p(d.getMilliseconds(), 3)}${sign}${hh}:${mm}`;
+}
+
 // ═══════════════════════════════════════════════
 // CalendarPanel sub-component (inline)
 // ═══════════════════════════════════════════════
@@ -658,7 +670,7 @@ export default {
         type: "string",
         defaultValue: computed(() =>
           props.content?.initValueStart
-            ? startOfDay(new Date(props.content.initValueStart)).toString()
+            ? toTimestamptz(startOfDay(new Date(props.content.initValueStart)))
             : ""
         ),
       });
@@ -670,35 +682,25 @@ export default {
         type: "string",
         defaultValue: computed(() =>
           props.content?.initValueEnd
-            ? endOfDay(new Date(props.content.initValueEnd)).toString()
+            ? toTimestamptz(endOfDay(new Date(props.content.initValueEnd)))
             : ""
         ),
       });
 
-    // ── Watch component variables for external changes → emit trigger ──
+    // ── Watch component variables for external changes → emit separate triggers ──
     watch(variableValueStart, (newVal, oldVal) => {
       if (newVal !== oldVal) {
         emit('trigger-event', {
-          name: 'value-change',
-          event: {
-            value: {
-              start: newVal || '',
-              end: variableValueEnd.value || '',
-            },
-          },
+          name: 'start-value-change',
+          event: { value: newVal || '' },
         });
       }
     });
     watch(variableValueEnd, (newVal, oldVal) => {
       if (newVal !== oldVal) {
         emit('trigger-event', {
-          name: 'value-change',
-          event: {
-            value: {
-              start: variableValueStart.value || '',
-              end: newVal || '',
-            },
-          },
+          name: 'end-value-change',
+          event: { value: newVal || '' },
         });
       }
     });
@@ -817,7 +819,7 @@ export default {
       return !!this.selectedStart;
     },
     displayValue() {
-      const fmt = this.content?.dateFormat || "dd MMM yyyy";
+      const fmt = this.content?.dateFormat || "yyyy-MM-dd";
       const loc = this.resolvedLocale;
       if (this.isRange && !this.content?.startEndInputs) {
         if (this.selectedStart && this.selectedEnd) {
@@ -835,7 +837,7 @@ export default {
       return this.selectedStart ? formatDate(this.selectedStart, fmt, loc) : "";
     },
     displayValueEnd() {
-      const fmt = this.content?.dateFormat || "dd MMM yyyy";
+      const fmt = this.content?.dateFormat || "yyyy-MM-dd";
       return this.selectedEnd
         ? formatDate(this.selectedEnd, fmt, this.resolvedLocale)
         : "";
@@ -869,7 +871,7 @@ export default {
       if (newVal === oldVal) return;
       if (newVal) {
         this.selectedStart = startOfDay(new Date(newVal));
-        this.setValueStart(this.selectedStart.toString());
+        this.setValueStart(toTimestamptz(this.selectedStart));
       } else {
         this.selectedStart = null;
         this.setValueStart("");
@@ -883,7 +885,7 @@ export default {
       if (newVal === oldVal) return;
       if (newVal) {
         this.selectedEnd = endOfDay(new Date(newVal));
-        this.setValueEnd(this.selectedEnd.toString());
+        this.setValueEnd(toTimestamptz(this.selectedEnd));
       } else {
         this.selectedEnd = null;
         this.setValueEnd("");
@@ -953,14 +955,18 @@ export default {
         // Single date mode
         this.selectedStart = startOfDay(date);
         this.selectedEnd = null;
-        this.setValueStart(this.selectedStart.toString());
+        this.setValueStart(toTimestamptz(this.selectedStart));
         this.setValueEnd("");
         this.activePreset = null;
+        // Navigate to clicked date's month if it's in a different month
+        if (date.getMonth() !== this.panelBaseDate.getMonth() || date.getFullYear() !== this.panelBaseDate.getFullYear()) {
+          this.panelBaseDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        }
         this.$emit("trigger-event", {
           name: "change",
           event: {
             value: {
-              start: this.selectedStart.toString(),
+              start: toTimestamptz(this.selectedStart),
               end: "",
             },
           },
@@ -971,13 +977,17 @@ export default {
         return;
       }
 
-      // Range mode
+      // Range mode — variables are NOT updated until both dates are picked
       if (!this.rangePicking) {
-        // First click
+        // First click — just store visually, do NOT update component variables
         this.selectedStart = startOfDay(date);
         this.selectedEnd = null;
         this.rangePicking = true;
         this.activePreset = null;
+        // Navigate to clicked date's month if it's in a different month
+        if (date.getMonth() !== this.panelBaseDate.getMonth() || date.getFullYear() !== this.panelBaseDate.getFullYear()) {
+          this.panelBaseDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        }
       } else {
         // Second click
         let start = this.selectedStart;
@@ -994,14 +1004,14 @@ export default {
         // Navigate to end date's month so user sees the complete selection
         this.panelBaseDate = new Date(end.getFullYear(), end.getMonth(), 1);
 
-        this.setValueStart(this.selectedStart.toString());
-        this.setValueEnd(this.selectedEnd.toString());
+        this.setValueStart(toTimestamptz(this.selectedStart));
+        this.setValueEnd(toTimestamptz(this.selectedEnd));
         this.$emit("trigger-event", {
           name: "change",
           event: {
             value: {
-              start: this.selectedStart.toString(),
-              end: this.selectedEnd.toString(),
+              start: toTimestamptz(this.selectedStart),
+              end: toTimestamptz(this.selectedEnd),
             },
           },
         });
@@ -1056,14 +1066,14 @@ export default {
       this.activePreset = preset.key;
       this.panelBaseDate = new Date(start);
 
-      this.setValueStart(start.toString());
-      this.setValueEnd(end.toString());
+      this.setValueStart(toTimestamptz(start));
+      this.setValueEnd(toTimestamptz(end));
       this.$emit("trigger-event", {
         name: "change",
         event: {
           value: {
-            start: start.toString(),
-            end: end.toString(),
+            start: toTimestamptz(start),
+            end: toTimestamptz(end),
           },
         },
       });
@@ -1130,7 +1140,7 @@ export default {
   box-sizing: border-box;
   padding: var(--tkb-input-padding, 8px 40px 8px 8px);
   padding-right: 40px;
-  border: 1.5px solid var(--tkb-border);
+  border: 1px solid var(--tkb-border);
   border-radius: var(--tkb-radius);
   font-size: var(--tkb-input-font-size, 12px);
   font-family: inherit;
@@ -1207,7 +1217,7 @@ export default {
 }
 .tkb-dp-panel-inner {
   padding: 16px;
-  width: 296px;
+  width: 254px;
 }
 .tkb-dp-panel-divider {
   width: 1px;
@@ -1343,10 +1353,13 @@ export default {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 2px;
+  justify-items: center;
 }
 .tkb-dp-day {
-  width: 100%;
-  aspect-ratio: 1;
+  width: 30px;
+  height: 28px;
+  padding: 4px 5px;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;

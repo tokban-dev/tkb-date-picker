@@ -33,11 +33,14 @@ export default {
       event: { value: "" },
     },
     {
-      name: "value-change",
-      label: { en: "On variable change" },
-      event: {
-        value: { start: "", end: "" },
-      },
+      name: "start-value-change",
+      label: { en: "On start value change" },
+      event: { value: "" },
+    },
+    {
+      name: "end-value-change",
+      label: { en: "On end value change" },
+      event: { value: "" },
     },
   ],
   properties: {
@@ -146,7 +149,7 @@ export default {
           { value: "d MMMM yyyy", label: { en: "14 March 2026" } },
         ],
       },
-      defaultValue: "dd MMM yyyy",
+      defaultValue: "yyyy-MM-dd",
       section: "settings",
       bindable: true,
       /* wwEditor:start */
