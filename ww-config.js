@@ -32,6 +32,13 @@ export default {
       label: { en: "On init value change" },
       event: { value: "" },
     },
+    {
+      name: "value-change",
+      label: { en: "On variable change" },
+      event: {
+        value: { start: "", end: "" },
+      },
+    },
   ],
   properties: {
     // ─── Settings Tab ───
@@ -103,6 +110,28 @@ export default {
       type: "Text",
       defaultValue: "Select date",
       section: "settings",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip: 'Placeholder text for the main date input (or start date in range mode).',
+      },
+      /* wwEditor:end */
+    },
+    placeholderEnd: {
+      hidden: (content) =>
+        content.showOn === "alwaysVisible" || content.pickerMode === "single" || !content.startEndInputs,
+      label: { en: "End date placeholder" },
+      type: "Text",
+      defaultValue: "",
+      section: "settings",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip: 'Placeholder text for the end date input in range mode. Falls back to translated "End date" if empty.',
+      },
+      /* wwEditor:end */
     },
     dateFormat: {
       label: { en: "Date display format" },
@@ -267,6 +296,33 @@ export default {
       type: "Number",
       options: () => ({ min: 0, max: 24, step: 1 }),
       defaultValue: 8,
+    },
+    inputPadding: {
+      label: { en: "Input padding" },
+      type: "Text",
+      defaultValue: "",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip: 'CSS padding for the input. E.g. "8px 14px" or "12px 16px". Right padding is always 40px for the icon.',
+      },
+      propertyHelp: {
+        tooltip: "Control vertical/horizontal padding inside the date input. Right side is always reserved for the calendar icon.",
+      },
+      /* wwEditor:end */
+    },
+    inputFontSize: {
+      label: { en: "Input font size" },
+      type: "Text",
+      defaultValue: "",
+      bindable: true,
+      /* wwEditor:start */
+      bindingValidation: {
+        type: "string",
+        tooltip: 'CSS font-size for the input. E.g. "14px" or "0.875rem". Defaults to 14px.',
+      },
+      /* wwEditor:end */
     },
     isDarkMode: {
       label: { en: "Dark mode" },

@@ -143,7 +143,7 @@
       <input
         type="text"
         class="tkb-dp-input"
-        :placeholder="t('endDate')"
+        :placeholder="content?.placeholderEnd || t('endDate')"
         :value="displayValueEnd"
         readonly
       />
@@ -788,7 +788,7 @@ export default {
     wwEditorState: { type: Object, required: true },
     /* wwEditor:end */
   },
-  setup(props) {
+  setup(props, { emit }) {
     const today = ref(startOfDay(new Date()));
 
     const { value: variableValueStart, setValue: setValueStart } =
@@ -814,6 +814,34 @@ export default {
             : ""
         ),
       });
+
+    // ── Watch component variables for external changes → emit trigger ──
+    watch(variableValueStart, (newVal, oldVal) => {
+      if (newVal !== oldVal) {
+        emit('trigger-event', {
+          name: 'value-change',
+          event: {
+            value: {
+              start: newVal || '',
+              end: variableValueEnd.value || '',
+            },
+          },
+        });
+      }
+    });
+    watch(variableValueEnd, (newVal, oldVal) => {
+      if (newVal !== oldVal) {
+        emit('trigger-event', {
+          name: 'value-change',
+          event: {
+            value: {
+              start: variableValueStart.value || '',
+              end: newVal || '',
+            },
+          },
+        });
+      }
+    });
 
     return { today, variableValueStart, variableValueEnd, setValueStart, setValueEnd };
   },
@@ -953,7 +981,7 @@ export default {
         : "";
     },
     cssVars() {
-      return {
+      const vars = {
         "--tkb-primary": this.content?.primaryColor || "#F08227",
         "--tkb-primary-light": this.content?.primaryLightColor || "#FFF3E8",
         "--tkb-primary-hover": this.content?.primaryHoverColor || "#FFFAF5",
@@ -961,6 +989,13 @@ export default {
         "--tkb-border": this.content?.borderColor || "#E8E8E8",
         "--tkb-radius": (this.content?.borderRadius ?? 8) + "px",
       };
+      if (this.content?.inputPadding) {
+        vars["--tkb-input-padding"] = this.content.inputPadding;
+      }
+      if (this.content?.inputFontSize) {
+        vars["--tkb-input-font-size"] = this.content.inputFontSize;
+      }
+      return vars;
     },
     layoutStyle() {
       return {
@@ -1206,7 +1241,7 @@ export default {
   display: flex;
   flex-direction: var(--direction, row);
   justify-content: var(--alignement, center);
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
   width: 100%;
   height: 100%;
@@ -1230,10 +1265,11 @@ export default {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  padding: 8px 40px 8px 14px;
+  padding: var(--tkb-input-padding, 8px 40px 8px 14px);
+  padding-right: 40px;
   border: 1.5px solid var(--tkb-border);
   border-radius: var(--tkb-radius);
-  font-size: 14px;
+  font-size: var(--tkb-input-font-size, 14px);
   font-family: inherit;
   color: var(--tkb-text);
   background: white;
