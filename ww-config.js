@@ -194,13 +194,13 @@ export default {
     showTodayButton: {
       label: { en: "Show Today button" },
       type: "OnOff",
-      defaultValue: true,
+      defaultValue: false,
       section: "settings",
     },
     showClearButton: {
       label: { en: "Show Clear button" },
       type: "OnOff",
-      defaultValue: true,
+      defaultValue: false,
       section: "settings",
     },
     clearOnClose: {
@@ -342,7 +342,7 @@ export default {
       label: { en: "Columns (range)" },
       options: () => ({ min: 1, max: 3, step: 1 }),
       responsive: true,
-      defaultValue: 2,
+      defaultValue: 1,
     },
     direction: {
       label: { en: "Direction" },

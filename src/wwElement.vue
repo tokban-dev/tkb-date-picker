@@ -1265,11 +1265,11 @@ export default {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  padding: var(--tkb-input-padding, 8px 40px 8px 14px);
+  padding: var(--tkb-input-padding, 8px 40px 8px 8px);
   padding-right: 40px;
   border: 1.5px solid var(--tkb-border);
   border-radius: var(--tkb-radius);
-  font-size: var(--tkb-input-font-size, 14px);
+  font-size: var(--tkb-input-font-size, 12px);
   font-family: inherit;
   color: var(--tkb-text);
   background: white;
