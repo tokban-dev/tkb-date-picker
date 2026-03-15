@@ -35,7 +35,7 @@
                 :today="today"
                 :locale="resolvedLocale"
                 :first-day-of-week="content?.firstDayOfWeek"
-                :show-nav="idx === 0 ? 'left' : 'right'"
+                :show-nav="panelDates.length === 1 ? 'both' : (idx === 0 ? 'left' : 'right')"
                 :min-date="resolvedMinDate"
                 :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
@@ -200,7 +200,7 @@
                 :today="today"
                 :locale="resolvedLocale"
                 :first-day-of-week="content?.firstDayOfWeek"
-                :show-nav="idx === 0 ? 'left' : 'right'"
+                :show-nav="panelDates.length === 1 ? 'both' : (idx === 0 ? 'left' : 'right')"
                 :min-date="resolvedMinDate"
                 :max-date="resolvedMaxDate"
                 @select-day="handleDaySelect"
@@ -1228,7 +1228,7 @@ export default {
 }
 .tkb-dp-presets li {
   padding: 8px 20px;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--tkb-text);
   cursor: pointer;
@@ -1262,7 +1262,7 @@ export default {
   justify-content: center;
 }
 .tkb-dp-header-label {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--tkb-text);
   cursor: pointer;
@@ -1350,7 +1350,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--tkb-text);
   border-radius: 6px;
@@ -1441,7 +1441,7 @@ export default {
 .tkb-dp-month-cell {
   padding: 10px 8px;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--tkb-text);
   border-radius: 6px;
@@ -1472,7 +1472,7 @@ export default {
 .tkb-dp-year-cell {
   padding: 10px 8px;
   text-align: center;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--tkb-text);
   border-radius: 6px;
