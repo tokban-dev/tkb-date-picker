@@ -44,6 +44,8 @@
                 @nav-next-month="navMonth(idx, 1)"
                 @nav-prev-year="navYear(idx, -1)"
                 @nav-next-year="navYear(idx, 1)"
+                @nav-prev-decade="navDecade(idx, -1)"
+                @nav-next-decade="navDecade(idx, 1)"
                 @select-month="(m) => handleMonthSelect(idx, m)"
                 @select-year="(y) => handleYearSelect(idx, y)"
                 @change-view="(v) => handleViewChange(idx, v)"
@@ -72,6 +74,8 @@
                 @nav-next-month="navMonth(0, 1)"
                 @nav-prev-year="navYear(0, -1)"
                 @nav-next-year="navYear(0, 1)"
+                @nav-prev-decade="navDecade(0, -1)"
+                @nav-next-decade="navDecade(0, 1)"
                 @select-month="(m) => handleMonthSelect(0, m)"
                 @select-year="(y) => handleYearSelect(0, y)"
                 @change-view="(v) => handleViewChange(0, v)"
@@ -205,6 +209,8 @@
                 @nav-next-month="navMonth(idx, 1)"
                 @nav-prev-year="navYear(idx, -1)"
                 @nav-next-year="navYear(idx, 1)"
+                @nav-prev-decade="navDecade(idx, -1)"
+                @nav-next-decade="navDecade(idx, 1)"
                 @select-month="(m) => handleMonthSelect(idx, m)"
                 @select-year="(y) => handleYearSelect(idx, y)"
                 @change-view="(v) => handleViewChange(idx, v)"
@@ -233,6 +239,8 @@
                 @nav-next-month="navMonth(0, 1)"
                 @nav-prev-year="navYear(0, -1)"
                 @nav-next-year="navYear(0, 1)"
+                @nav-prev-decade="navDecade(0, -1)"
+                @nav-next-decade="navDecade(0, 1)"
                 @select-month="(m) => handleMonthSelect(0, m)"
                 @select-year="(y) => handleYearSelect(0, y)"
                 @change-view="(v) => handleViewChange(0, v)"
@@ -411,6 +419,8 @@ const CalendarPanel = defineComponent({
     "nav-next-month",
     "nav-prev-year",
     "nav-next-year",
+    "nav-prev-decade",
+    "nav-next-decade",
     "select-month",
     "select-year",
     "change-view",
@@ -528,246 +538,96 @@ const CalendarPanel = defineComponent({
 
     return () => {
       const t = trans.value;
+      const showPrev = props.showNav === "both" || props.showNav === "left";
+      const showNext = props.showNav === "both" || props.showNav === "right";
 
-      // Header with navigation
-      const showPrev =
-        props.showNav === "both" || props.showNav === "left";
-      const showNext =
-        props.showNav === "both" || props.showNav === "right";
-
-      const navPrevYear = showPrev
-        ? h(
-            "button",
-            {
-              class: "tkb-dp-nav-btn tkb-dp-nav-super",
-              onClick: () => emit("nav-prev-year"),
-              title: t.months ? "Previous year" : "",
-            },
-            [
-              h(
-                "svg",
-                {
-                  width: 14,
-                  height: 14,
-                  viewBox: "0 0 24 24",
-                  fill: "none",
-                  stroke: "currentColor",
-                  "stroke-width": 2,
-                  "stroke-linecap": "round",
-                  "stroke-linejoin": "round",
-                },
-                [
-                  h("polyline", { points: "11,18 5,12 11,6" }),
-                  h("polyline", { points: "19,18 13,12 19,6" }),
-                ]
-              ),
-            ]
-          )
-        : h("span", { class: "tkb-dp-nav-spacer" });
-
-      const navPrevMonth = showPrev
-        ? h(
-            "button",
-            {
-              class: "tkb-dp-nav-btn",
-              onClick: () => emit("nav-prev-month"),
-            },
-            [
-              h(
-                "svg",
-                {
-                  width: 14,
-                  height: 14,
-                  viewBox: "0 0 24 24",
-                  fill: "none",
-                  stroke: "currentColor",
-                  "stroke-width": 2,
-                  "stroke-linecap": "round",
-                  "stroke-linejoin": "round",
-                },
-                [h("polyline", { points: "15,18 9,12 15,6" })]
-              ),
-            ]
-          )
-        : h("span", { class: "tkb-dp-nav-spacer" });
-
-      const navNextMonth = showNext
-        ? h(
-            "button",
-            {
-              class: "tkb-dp-nav-btn",
-              onClick: () => emit("nav-next-month"),
-            },
-            [
-              h(
-                "svg",
-                {
-                  width: 14,
-                  height: 14,
-                  viewBox: "0 0 24 24",
-                  fill: "none",
-                  stroke: "currentColor",
-                  "stroke-width": 2,
-                  "stroke-linecap": "round",
-                  "stroke-linejoin": "round",
-                },
-                [h("polyline", { points: "9,6 15,12 9,18" })]
-              ),
-            ]
-          )
-        : h("span", { class: "tkb-dp-nav-spacer" });
-
-      const navNextYear = showNext
-        ? h(
-            "button",
-            {
-              class: "tkb-dp-nav-btn tkb-dp-nav-super",
-              onClick: () => emit("nav-next-year"),
-            },
-            [
-              h(
-                "svg",
-                {
-                  width: 14,
-                  height: 14,
-                  viewBox: "0 0 24 24",
-                  fill: "none",
-                  stroke: "currentColor",
-                  "stroke-width": 2,
-                  "stroke-linecap": "round",
-                  "stroke-linejoin": "round",
-                },
-                [
-                  h("polyline", { points: "5,6 11,12 5,18" }),
-                  h("polyline", { points: "13,6 19,12 13,18" }),
-                ]
-              ),
-            ]
-          )
-        : h("span", { class: "tkb-dp-nav-spacer" });
-
-      const monthLabel = h(
-        "button",
-        {
-          class: "tkb-dp-header-label",
-          onClick: () => {
-            localView.value =
-              localView.value === "months" ? "days" : "months";
-            emit("change-view", localView.value);
-          },
-        },
-        t.monthsShort[month.value]
-      );
-
-      const yearLabel = h(
-        "button",
-        {
-          class: "tkb-dp-header-label",
-          onClick: () => {
-            localView.value =
-              localView.value === "years" ? "days" : "years";
-            emit("change-view", localView.value);
-          },
-        },
-        String(year.value)
-      );
-
-      const header = h("div", { class: "tkb-dp-header" }, [
-        navPrevYear,
-        navPrevMonth,
-        h("div", { class: "tkb-dp-header-center" }, [monthLabel, yearLabel]),
-        navNextMonth,
-        navNextYear,
-      ]);
+      // Helper: create a navigation arrow button
+      const svgAttrs = { width: 14, height: 14, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": 2, "stroke-linecap": "round", "stroke-linejoin": "round" };
+      const makeArrow = (dir, isSuper, onClick) => {
+        if (!onClick) return h("span", { class: "tkb-dp-nav-spacer" });
+        const cls = isSuper ? "tkb-dp-nav-btn tkb-dp-nav-super" : "tkb-dp-nav-btn";
+        let icon;
+        if (dir === "left" && isSuper) icon = [h("polyline", { points: "11,18 5,12 11,6" }), h("polyline", { points: "19,18 13,12 19,6" })];
+        else if (dir === "left") icon = [h("polyline", { points: "15,18 9,12 15,6" })];
+        else if (dir === "right" && isSuper) icon = [h("polyline", { points: "5,6 11,12 5,18" }), h("polyline", { points: "13,6 19,12 13,18" })];
+        else icon = [h("polyline", { points: "9,6 15,12 9,18" })];
+        return h("button", { class: cls, onClick }, [h("svg", svgAttrs, icon)]);
+      };
 
       // ─── Days view ───
       if (localView.value === "days") {
-        const weekdayRow = h(
-          "div",
-          { class: "tkb-dp-weekdays" },
-          weekdayHeaders.value.map((wd) =>
-            h("span", { class: "tkb-dp-weekday" }, wd)
-          )
-        );
-
-        const daysCells = h(
-          "div",
-          { class: "tkb-dp-days" },
-          daysGrid.value.map((cell) => {
-            const disabled = isDayDisabled(cell.date);
-            return h(
-              "span",
-              {
-                class: getDayClasses(cell),
-                onClick: disabled ? undefined : () => emit("select-day", cell.date),
-                onMouseenter: disabled ? undefined : () => emit("hover-day", cell.date),
-              },
-              String(cell.date.getDate())
-            );
-          })
-        );
-
-        return h("div", { class: "tkb-dp-panel-inner" }, [
-          header,
-          weekdayRow,
-          daysCells,
+        const header = h("div", { class: "tkb-dp-header" }, [
+          showPrev ? makeArrow("left", true, () => emit("nav-prev-year")) : h("span", { class: "tkb-dp-nav-spacer" }),
+          showPrev ? makeArrow("left", false, () => emit("nav-prev-month")) : h("span", { class: "tkb-dp-nav-spacer" }),
+          h("div", { class: "tkb-dp-header-center" }, [
+            h("button", { class: "tkb-dp-header-label", onClick: () => { localView.value = "months"; emit("change-view", "months"); } }, t.monthsShort[month.value]),
+            h("button", { class: "tkb-dp-header-label", onClick: () => { localView.value = "years"; emit("change-view", "years"); } }, String(year.value)),
+          ]),
+          showNext ? makeArrow("right", false, () => emit("nav-next-month")) : h("span", { class: "tkb-dp-nav-spacer" }),
+          showNext ? makeArrow("right", true, () => emit("nav-next-year")) : h("span", { class: "tkb-dp-nav-spacer" }),
         ]);
+
+        const weekdayRow = h("div", { class: "tkb-dp-weekdays" }, weekdayHeaders.value.map((wd) => h("span", { class: "tkb-dp-weekday" }, wd)));
+        const daysCells = h("div", { class: "tkb-dp-days" }, daysGrid.value.map((cell) => {
+          const disabled = isDayDisabled(cell.date);
+          return h("span", {
+            class: getDayClasses(cell),
+            onClick: disabled ? undefined : () => emit("select-day", cell.date),
+            onMouseenter: disabled ? undefined : () => emit("hover-day", cell.date),
+          }, String(cell.date.getDate()));
+        }));
+
+        return h("div", { class: "tkb-dp-panel-inner" }, [header, weekdayRow, daysCells]);
       }
 
       // ─── Months view ───
       if (localView.value === "months") {
-        const monthCells = h(
-          "div",
-          { class: "tkb-dp-month-grid" },
-          t.monthsShort.map((name, i) => {
-            const cls = ["tkb-dp-month-cell"];
-            if (i === props.today.getMonth() && year.value === props.today.getFullYear())
-              cls.push("tkb-dp-month-cell--current");
-            if (i === month.value)
-              cls.push("tkb-dp-month-cell--selected");
-            return h(
-              "span",
-              {
-                class: cls.join(" "),
-                onClick: () => {
-                  emit("select-month", i);
-                  localView.value = "days";
-                  emit("change-view", "days");
-                },
-              },
-              name
-            );
-          })
-        );
+        // Months view: show [<] Year [>] — arrows navigate years, click year → years view
+        const header = h("div", { class: "tkb-dp-header" }, [
+          makeArrow("left", false, () => emit("nav-prev-year")),
+          h("div", { class: "tkb-dp-header-center" }, [
+            h("button", { class: "tkb-dp-header-label", onClick: () => { localView.value = "years"; emit("change-view", "years"); } }, String(year.value)),
+          ]),
+          makeArrow("right", false, () => emit("nav-next-year")),
+        ]);
+
+        const monthCells = h("div", { class: "tkb-dp-month-grid" }, t.monthsShort.map((name, i) => {
+          const cls = ["tkb-dp-month-cell"];
+          if (i === props.today.getMonth() && year.value === props.today.getFullYear()) cls.push("tkb-dp-month-cell--current");
+          if (i === month.value) cls.push("tkb-dp-month-cell--selected");
+          return h("span", {
+            class: cls.join(" "),
+            onClick: () => { emit("select-month", i); localView.value = "days"; emit("change-view", "days"); },
+          }, name);
+        }));
 
         return h("div", { class: "tkb-dp-panel-inner" }, [header, monthCells]);
       }
 
       // ─── Years view ───
       if (localView.value === "years") {
-        const yearCells = h(
-          "div",
-          { class: "tkb-dp-year-grid" },
-          yearsGrid.value.map((y) => {
-            const cls = ["tkb-dp-year-cell"];
-            if (y === props.today.getFullYear())
-              cls.push("tkb-dp-year-cell--current");
-            if (y === year.value)
-              cls.push("tkb-dp-year-cell--selected");
-            return h(
-              "span",
-              {
-                class: cls.join(" "),
-                onClick: () => {
-                  emit("select-year", y);
-                  localView.value = "days";
-                  emit("change-view", "days");
-                },
-              },
-              String(y)
-            );
-          })
-        );
+        // Years view: show [<] 2024–2035 [>] — arrows navigate by 12 years (decade)
+        const base = year.value - (year.value % 12);
+        const rangeLabel = base + " \u2013 " + (base + 11);
+
+        const header = h("div", { class: "tkb-dp-header" }, [
+          makeArrow("left", false, () => emit("nav-prev-decade")),
+          h("div", { class: "tkb-dp-header-center" }, [
+            h("span", { class: "tkb-dp-header-label tkb-dp-header-label--static" }, rangeLabel),
+          ]),
+          makeArrow("right", false, () => emit("nav-next-decade")),
+        ]);
+
+        // Select year → go to months view (drill down: years → months → days)
+        const yearCells = h("div", { class: "tkb-dp-year-grid" }, yearsGrid.value.map((y) => {
+          const cls = ["tkb-dp-year-cell"];
+          if (y === props.today.getFullYear()) cls.push("tkb-dp-year-cell--current");
+          if (y === year.value) cls.push("tkb-dp-year-cell--selected");
+          return h("span", {
+            class: cls.join(" "),
+            onClick: () => { emit("select-year", y); localView.value = "months"; emit("change-view", "months"); },
+          }, String(y));
+        }));
 
         return h("div", { class: "tkb-dp-panel-inner" }, [header, yearCells]);
       }
@@ -1131,6 +991,9 @@ export default {
         this.rangePicking = false;
         this.hoverDate = null;
 
+        // Navigate to end date's month so user sees the complete selection
+        this.panelBaseDate = new Date(end.getFullYear(), end.getMonth(), 1);
+
         this.setValueStart(this.selectedStart.toString());
         this.setValueEnd(this.selectedEnd.toString());
         this.$emit("trigger-event", {
@@ -1143,7 +1006,7 @@ export default {
           },
         });
         if (this.content?.showOn !== "alwaysVisible") {
-          setTimeout(() => (this.isOpen = false), 300);
+          setTimeout(() => (this.isOpen = false), 400);
         }
       }
     },
@@ -1165,6 +1028,9 @@ export default {
     navYear(idx, delta) {
       this.panelBaseDate = addYears(this.panelBaseDate, delta);
     },
+    navDecade(idx, delta) {
+      this.panelBaseDate = addYears(this.panelBaseDate, delta * 12);
+    },
     handleMonthSelect(idx, monthIndex) {
       const d = new Date(this.panelBaseDate);
       d.setMonth(monthIndex);
@@ -1175,7 +1041,7 @@ export default {
       const d = new Date(this.panelBaseDate);
       d.setFullYear(year);
       this.panelBaseDate = d;
-      this.calendarView = "days";
+      this.calendarView = "months";
     },
     handleViewChange(idx, view) {
       this.calendarView = view;
@@ -1244,7 +1110,6 @@ export default {
   align-items: stretch;
   gap: 8px;
   width: 100%;
-  height: 100%;
   font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   box-sizing: border-box;
 }
@@ -1255,7 +1120,6 @@ export default {
   display: flex;
   align-items: center;
   flex: 1;
-  height: 100%;
   min-width: 0;
 }
 .tkb-dp-input-wrap.tkb-dp-range-input {
@@ -1263,7 +1127,6 @@ export default {
 }
 .tkb-dp-input {
   width: 100%;
-  height: 100%;
   box-sizing: border-box;
   padding: var(--tkb-input-padding, 8px 40px 8px 8px);
   padding-right: 40px;
@@ -1413,6 +1276,13 @@ export default {
 .tkb-dp-header-label:hover {
   background: #F4F4F4;
   color: var(--tkb-primary);
+}
+.tkb-dp-header-label--static {
+  cursor: default;
+}
+.tkb-dp-header-label--static:hover {
+  background: transparent;
+  color: var(--tkb-text);
 }
 .tkb-dp-nav-btn {
   width: 28px;
